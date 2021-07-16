@@ -9,10 +9,10 @@ import java.net.URL
 import kotlin.concurrent.thread
 
 class JSONManager {
-    public fun loadAllShopList(): MutableList<Data> {
-        var res = mutableListOf<Data>()
+    public fun loadAllShopList(): MutableList<ShopData> {
+        var res = mutableListOf<ShopData>()
         thread(start=true){//스레드로 시작
-            val urlText = "http://192.168.1.101:14766/byeongseong/index.jsp".toString()
+            val urlText = ipadress.urlText
             val url = URL(urlText)//url 객체 생성
             val urlConnection = url.openConnection() as HttpURLConnection//openConnection으로 서버와 연결, HttpURLConnection으로 변환
             if(urlConnection.responseCode == HttpURLConnection.HTTP_OK){//응답이 괜찮으면
@@ -37,10 +37,9 @@ class JSONManager {
                     var info = tmpdata.getString("info")
                     var category = tmpdata.getInt("category")
                     Log.d("loading","" + number + " " + name+ " " + score+ " " + menutable+ " " + info+ " " + category)
-                    var tmpobj = Data(number,score,menutable,name,category,info)
+                    var tmpobj = ShopData(number,name,score,menutable,category,info)
                     res.add(tmpobj)
                 }
-
             }
         }
         return res

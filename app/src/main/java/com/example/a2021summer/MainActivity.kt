@@ -2,6 +2,7 @@ package com.example.a2021summer
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.a2021summer.databinding.ActivityMainBinding
@@ -10,7 +11,9 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
-
+object ipadress{
+    @JvmField val urlText = "http://192.168.1.101:14766/byeongseong/index.jsp".toString()
+}
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,12 +21,12 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         val view = viewBinding.root
         setContentView(view)
-        var jsonManager = JSONManager()
-        var shoplist = jsonManager.loadAllShopList()
+
+
         viewBinding.btnRequest.setOnClickListener{
 
             thread(start=true){//스레드로 시작
-                val urlText = "http://192.168.1.101:14766/byeongseong/index.jsp".toString()
+                val urlText = ipadress.urlText
                 val url = URL(urlText)//url 객체 생성
                 val urlConnection = url.openConnection() as HttpURLConnection//openConnection으로 서버와 연결, HttpURLConnection으로 변환
                 if(urlConnection.responseCode == HttpURLConnection.HTTP_OK){//응답이 괜찮으면
@@ -63,5 +66,12 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SubActivity::class.java)
             startActivity(intent)
         }
+        var jsonManager = JSONManager()
+        var shoplist = jsonManager.loadAllShopList()
+        Thread.sleep(2000)
+        var shopadapter = ShopListAdapter(this,shoplist)
+        Log.d("recycleView",shoplist.size.toString())
+        viewBinding.mainshoplist.adapter = shopadapter
+
     }
 }
