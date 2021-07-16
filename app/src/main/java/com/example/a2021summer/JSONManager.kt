@@ -1,5 +1,8 @@
 package com.example.a2021summer
 import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.json.JSONArray
 import java.io.BufferedReader
@@ -9,9 +12,9 @@ import java.net.URL
 import kotlin.concurrent.thread
 
 class JSONManager {
-    public fun loadAllShopList(): MutableList<ShopData> {
+    fun loadAllShopList(): MutableList<ShopData> {
         var res = mutableListOf<ShopData>()
-        thread(start=true){//스레드로 시작
+        //GlobalScope.launch(Dispatchers.Main){//스레드로 시작
             val urlText = ipadress.urlText
             val url = URL(urlText)//url 객체 생성
             val urlConnection = url.openConnection() as HttpURLConnection//openConnection으로 서버와 연결, HttpURLConnection으로 변환
@@ -41,7 +44,7 @@ class JSONManager {
                     res.add(tmpobj)
                 }
             }
-        }
+      //  }
         return res
     }
 }

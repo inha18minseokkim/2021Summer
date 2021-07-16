@@ -5,7 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a2021summer.databinding.ActivityMainBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -66,12 +71,22 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SubActivity::class.java)
             startActivity(intent)
         }
+
+        //메인화면 레이아웃 배치
         var jsonManager = JSONManager()
-        var shoplist = jsonManager.loadAllShopList()
-        Thread.sleep(2000)
-        var shopadapter = ShopListAdapter(this,shoplist)
-        Log.d("recycleView",shoplist.size.toString())
-        viewBinding.mainshoplist.adapter = shopadapter
+        var mainContext = this
+        thread(start=true){
+            var shoplist = jsonManager.loadAllShopList()
+            var shopadapter = ShopListAdapter(mainContext,shoplist)
+            Log.d("recycleView",shoplist.size.toString())
+            runOnUiThread{
+                viewBinding.mainshoplist.adapter = shopadapter
+                var layout = LinearLayoutManager(mainContext)
+                viewBinding.mainshoplist.layoutManager = layout
+                viewBinding.mainshoplist.setHasFixedSize(true)
+                shopadapter.notifyDataSetChanged()
+            }
+        }
 
     }
 }
