@@ -3,7 +3,7 @@ package com.example.a2021summer
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import com.example.a2021summer.databinding.ActivityMainBinding
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -11,10 +11,13 @@ import java.net.URL
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var viewBinding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        btnRequest.setOnClickListener{
+        viewBinding = ActivityMainBinding.inflate(layoutInflater)
+        val view = viewBinding.root
+        setContentView(view)
+        viewBinding.btnRequest.setOnClickListener{
             thread(start=true){//스레드로 시작
                 val urlText = "http://118.45.175.171:14766/byeongseong/index.jsp".toString()
                 val url = URL(urlText)//url 객체 생성
@@ -31,7 +34,7 @@ class MainActivity : AppCompatActivity() {
                     buffered.close()
                     urlConnection.disconnect()
                     runOnUiThread{
-                        textView.text = content.toString()
+                        viewBinding.textView.text = content.toString()
                     }
                 }
             }
