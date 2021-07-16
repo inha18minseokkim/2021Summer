@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         val view = viewBinding.root
         setContentView(view)
+        viewBinding.textView.text = "ASDFASFDASDFA"
         viewBinding.btnRequest.setOnClickListener{
             thread(start=true){//스레드로 시작
                 val urlText = "http://118.45.175.171:14766/byeongseong/index.jsp".toString()
