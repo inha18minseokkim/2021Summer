@@ -1,5 +1,6 @@
 package com.example.a2021summer
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
         viewBinding.textView.text = "ASDFASFDASDFA"
         viewBinding.btnRequest.setOnClickListener{
+
             thread(start=true){//스레드로 시작
                 val urlText = "http://118.45.175.171:14766/byeongseong/index.jsp".toString()
                 val url = URL(urlText)//url 객체 생성
@@ -39,6 +41,26 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        viewBinding.button2.setOnClickListener {
+            val intent = Intent(this, SubActivity::class.java)
+            startActivity(intent)
+        }
+
+        viewBinding.button3.setOnClickListener {
+            val intent = Intent(this, SubActivity::class.java)
+            startActivity(intent)
+        }
+
+        viewBinding.button4.setOnClickListener {
+            val intent = Intent(this, SubActivity::class.java)
+            startActivity(intent)
+        }
+
+        viewBinding.button5.setOnClickListener {
+            val intent = Intent(this, SubActivity::class.java)
+            startActivity(intent)
         }
     }
 }
