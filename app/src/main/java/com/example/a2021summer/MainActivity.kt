@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        viewBinding.button2.setOnClickListener {
+        /*viewBinding.button2.setOnClickListener {
             val intent = Intent(this, SubActivity::class.java)
             startActivity(intent)
         }
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         viewBinding.button5.setOnClickListener {
             val intent = Intent(this, SubActivity::class.java)
             startActivity(intent)
-        }
+        }*/
 
         //메인화면 레이아웃 배치
         var jsonManager = JSONManager()
