@@ -8,3 +8,8 @@ data class ShopData (
     val category: Int,
     val info: String
     )
+data class MenuData(
+    val idx: Int,
+    val name: String,
+    val price: Int
+)

@@ -6,15 +6,28 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="452dp"
-        android:layout_height="704dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/shopTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="shopTitle" />
+
+        <TextView
+            android:id="@+id/shopInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="shopInfo" />
+
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/menulist"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>

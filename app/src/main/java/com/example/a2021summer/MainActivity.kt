@@ -17,7 +17,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 object ipadress{
-    @JvmField val urlText = "http://192.168.1.101:14766/byeongseong/index.jsp".toString()
+    @JvmField val urlText = "http://192.168.1.101:14766/byeongseong/".toString()
 }
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         viewBinding.btnRequest.setOnClickListener{
 
             thread(start=true){//스레드로 시작
-                val urlText = ipadress.urlText
+                val urlText = ipadress.urlText + "index.jsp"
                 val url = URL(urlText)//url 객체 생성
                 val urlConnection = url.openConnection() as HttpURLConnection//openConnection으로 서버와 연결, HttpURLConnection으로 변환
                 if(urlConnection.responseCode == HttpURLConnection.HTTP_OK){//응답이 괜찮으면
