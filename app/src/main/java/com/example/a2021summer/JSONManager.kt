@@ -1,8 +1,8 @@
 package com.example.a2021summer
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
+/*import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.launch*/
 import org.json.JSONObject
 import org.json.JSONArray
 import java.io.BufferedReader

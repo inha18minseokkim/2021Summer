@@ -7,17 +7,13 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a2021summer.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 object ipadress{
-    @JvmField val urlText = "http://172.30.1.19:14766/byeongseong/".toString()
+    @JvmField val urlText = "http://192.168.1.101:14766/byeongseong/".toString()
 }
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
