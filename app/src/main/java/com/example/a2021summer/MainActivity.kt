@@ -1,9 +1,11 @@
 package com.example.a2021summer
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a2021summer.databinding.ActivityMainBinding
@@ -13,7 +15,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 object ipadress{
-    @JvmField val urlText = "http://192.168.1.101:14766/byeongseong/".toString()
+    @JvmField val urlText = "http://172.30.1.19:14766/byeongseong/".toString()
 }
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
@@ -24,29 +26,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
 
-        viewBinding.btnRequest.setOnClickListener{
 
-            thread(start=true){//스레드로 시작
-                val urlText = ipadress.urlText + "index.jsp"
-                val url = URL(urlText)//url 객체 생성
-                val urlConnection = url.openConnection() as HttpURLConnection//openConnection으로 서버와 연결, HttpURLConnection으로 변환
-                if(urlConnection.responseCode == HttpURLConnection.HTTP_OK){//응답이 괜찮으면
-                    val streamReader = InputStreamReader(urlConnection.inputStream)//입력스트림 연결
-                    val buffered = BufferedReader(streamReader) //버퍼에 리더 담아
-
-                    val content = StringBuilder()
-                    while(true){
-                        val line = buffered.readLine() ?: break
-                        content.append(line)
-                    }
-                    buffered.close()
-                    urlConnection.disconnect()
-                    runOnUiThread{
-                        viewBinding.textView.text = content.toString()
-                    }
-                }
-            }
-        }
 
         /*viewBinding.button2.setOnClickListener {
             val intent = Intent(this, SubActivity::class.java)
@@ -81,6 +61,19 @@ class MainActivity : AppCompatActivity() {
                 viewBinding.mainshoplist.layoutManager = layout
                 viewBinding.mainshoplist.setHasFixedSize(true)
                 shopadapter.notifyDataSetChanged()
+            }
+        }
+        viewBinding.btnSearch.setOnClickListener{
+            var keyword = viewBinding.searchContent.text.toString()
+            if(keyword.isEmpty()){
+                var builder = AlertDialog.Builder(this)
+                builder.setMessage("내용을 입력해 주세요.")
+                builder.setPositiveButton("확인",{ dialogInterface: DialogInterface, i: Int -> })
+                builder.show()
+            } else {
+                var intent = Intent(this,SearchActivity::class.java)
+                intent.putExtra("key",keyword)
+                startActivity(intent)
             }
         }
 
