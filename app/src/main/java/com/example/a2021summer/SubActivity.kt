@@ -33,7 +33,7 @@ class SubActivity : AppCompatActivity() {
                 viewBinding.menulist.setHasFixedSize(true)
                 menuAdapter.notifyDataSetChanged()
             }
-        }
+        }//sdf
         viewBinding.goToCart.setOnClickListener{
             var tmplist = mutableListOf<Int>()
             for (i in 0..selected.size-1){
