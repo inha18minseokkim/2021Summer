@@ -42,7 +42,7 @@ class MenuListAdapter(var context: Context,var data: MutableList<MenuData>) : Re
                     Log.d("MenuListAdapter","Selected")
                 } else {//선택됨
                     tmpactivity.selected[menuidx] = 0
-                    //itemView.setBackgroundColor(R.color.design_default_color_background)
+                    //itemView.setBackgroundColor(R.color.design_default_color_background)gigigigiugig
                     Log.d("MenuListAdapter","UnSelected")
                 }
             }
