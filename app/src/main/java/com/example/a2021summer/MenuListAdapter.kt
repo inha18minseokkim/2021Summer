@@ -31,18 +31,19 @@ class MenuListAdapter(var context: Context,var data: MutableList<MenuData>) : Re
         fun bind(menudata: MenuData){
             menuname.text = menudata.name
             menuprice.text = menudata.price.toString()
-            menuidx = menudata.idx
+            menuidx = menudata.idx-1
+            itemView.setBackgroundColor(R.color.white)
             itemView.setOnClickListener{
                 Log.d("MenuListAdapter",menuidx.toString())
                 var tmpactivity = context as SubActivity
                 var status = tmpactivity.selected[menuidx]
                 if(status == 0){//선택안됨
                     tmpactivity.selected[menuidx] = 1
-                    //itemView.setBackgroundColor(R.color.design_default_color_on_secondary)
+                    itemView.setBackgroundColor(R.color.black)
                     Log.d("MenuListAdapter","Selected")
                 } else {//선택됨
                     tmpactivity.selected[menuidx] = 0
-                    //itemView.setBackgroundColor(R.color.design_default_color_background)gigigigiugig
+                    itemView.setBackgroundColor(R.color.white)
                     Log.d("MenuListAdapter","UnSelected")
                 }
             }
