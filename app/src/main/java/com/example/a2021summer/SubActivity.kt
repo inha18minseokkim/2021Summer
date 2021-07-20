@@ -11,6 +11,7 @@ import kotlin.concurrent.thread
 class SubActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySubBinding
     lateinit var passData: Array<String>
+    lateinit var selected: Array<Int>
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         viewBinding = ActivitySubBinding.inflate(layoutInflater)
@@ -23,6 +24,7 @@ class SubActivity : AppCompatActivity() {
         thread(start=true){
             var tmp = jsonmanager.loadMenuList(passData[0])
             var menuAdapter = MenuListAdapter(subContext,tmp)
+            selected = Array(tmp.size,{i->0})
             runOnUiThread{
                 viewBinding.menulist.adapter = menuAdapter
                 var layout = LinearLayoutManager(subContext)

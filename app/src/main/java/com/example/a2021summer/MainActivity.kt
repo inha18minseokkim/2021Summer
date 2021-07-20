@@ -17,7 +17,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 object ipadress{
-    @JvmField val urlText = "http://192.168.1.101:14766/byeongseong/".toString()
+    @JvmField val urlText = "http://172.30.1.19:14766/byeongseong/".toString()
 }
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
