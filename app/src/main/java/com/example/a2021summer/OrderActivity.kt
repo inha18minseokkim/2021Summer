@@ -9,4 +9,8 @@ class OrderActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_order)
     }
+
+    override fun onBackPressed(){
+        finish()
+    }
 }
