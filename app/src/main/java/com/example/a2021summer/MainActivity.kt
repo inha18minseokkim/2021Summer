@@ -46,7 +46,15 @@ class MainActivity : AppCompatActivity() {
         viewBinding.button5.setOnClickListener {
             val intent = Intent(this, SubActivity::class.java)
             startActivity(intent)
+        }
+
+        viewBinding.btnOrder.setOnClickListener {
+            val intent = Intent(this, OrderActivity::class.java)
+            startActivity(intent)
         }*/
+
+
+
 
         //메인화면 레이아웃 배치
         var jsonManager = JSONManager()
