@@ -1,24 +1,38 @@
 package com.example.a2021summer
 
+import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageInstaller
+import android.content.pm.PackageManager
+import android.media.MediaSession2
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
-import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a2021summer.databinding.ActivityMainBinding
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
+import com.kakao.auth.AuthType
+import com.kakao.auth.KakaoSDK
+import com.kakao.auth.Session
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import kotlin.concurrent.thread
+import com.kakao.usermgmt.UserManagement
+import com.kakao.usermgmt.callback.LogoutResponseCallback
+import com.kakao.util.helper.CommonProtocol
+import com.kakao.util.helper.Utility
+
+
 object ipadress{
     @JvmField val urlText = "http://192.168.1.101:14766/byeongseong/".toString()
 }
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
+    lateinit var session: Session
+    private var sessionCallback = SessionCallback()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -81,6 +95,43 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+        getHashKey()
+        session = Session.getCurrentSession()
+        session.addCallback(sessionCallback)
+        viewBinding.login.setOnClickListener{
+            session.open(AuthType.KAKAO_LOGIN_ALL,this)
+        }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Session.getCurrentSession().removeCallback(sessionCallback);
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        // 카카오톡|스토리 간편로그인 실행 결과를 받아서 SDK로 전달
+        if(Session.getCurrentSession().handleActivityResult(requestCode,resultCode,data)){
+            return
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+    private fun getHashKey() {
+        var packageInfo: PackageInfo? = null
+        try {
+            packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        if (packageInfo == null) Log.e("KeyHash", "KeyHash:null")
+        for (signature in packageInfo!!.signatures) {
+            try {
+                val md: MessageDigest = MessageDigest.getInstance("SHA")
+                md.update(signature.toByteArray())
+                Log.d("KeyHash", Base64.encodeToString(md.digest(), Base64.DEFAULT))
+            } catch (e: NoSuchAlgorithmException) {
+                Log.e("KeyHash", "Unable to get MessageDigest. signature=$signature", e)
+            }
+        }
     }
 }
