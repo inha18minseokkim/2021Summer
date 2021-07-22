@@ -17,10 +17,12 @@ import com.example.a2021summer.databinding.ActivityMainBinding
 import com.kakao.auth.AuthType
 import com.kakao.auth.KakaoSDK
 import com.kakao.auth.Session
+import com.kakao.sdk.user.UserApiClient
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import kotlin.concurrent.thread
 import com.kakao.usermgmt.UserManagement
+import com.kakao.usermgmt.api.UserApi
 import com.kakao.usermgmt.callback.LogoutResponseCallback
 import com.kakao.util.helper.CommonProtocol
 import com.kakao.util.helper.Utility
@@ -38,8 +40,7 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         val view = viewBinding.root
         setContentView(view)
-
-
+        /*버튼 및 리스트 초기화 부분*/
         /*
         viewBinding.btnOrder.setOnClickListener {
             val intent = Intent(this, OrderActivity::class.java)
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        //메인화면 레이아웃 배치
+        /*메인화면 레이아웃 배치*/
         var jsonManager = JSONManager()
         var mainContext = this
         thread(start=true){
@@ -95,13 +96,24 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-        getHashKey()
+
+        /*카카오톡 로그인 API 구현*/
+
         session = Session.getCurrentSession()
         session.addCallback(sessionCallback)
         viewBinding.login.setOnClickListener{
             session.open(AuthType.KAKAO_LOGIN_ALL,this)
         }
-
+        /*UserApiClient.instance.me { user, error->
+            if(error != null){ Log.d("kakaoLogin","사용자 로그인 안됩니다 시불") }
+            else if(user != null) {
+                Log.i("kakaoLogin", "사용자 정보 요청 성공" +
+                        "\n회원번호: ${user.id}" +
+                        "\n이메일: ${user.kakaoAccount?.email}" +
+                        "\n닉네임: ${user.kakaoAccount?.profile?.nickname}" +
+                        "\n프로필사진: ${user.kakaoAccount?.profile?.thumbnailImageUrl}")
+            }
+        }*/
     }
 
     override fun onDestroy() {
@@ -114,9 +126,10 @@ class MainActivity : AppCompatActivity() {
         if(Session.getCurrentSession().handleActivityResult(requestCode,resultCode,data)){
             return
         }
+        Log.d("kakaoLogin",data.toString())
         super.onActivityResult(requestCode, resultCode, data)
     }
-    private fun getHashKey() {
+    /*private fun getHashKey() {
         var packageInfo: PackageInfo? = null
         try {
             packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
@@ -133,5 +146,5 @@ class MainActivity : AppCompatActivity() {
                 Log.e("KeyHash", "Unable to get MessageDigest. signature=$signature", e)
             }
         }
-    }
+    }*/
 }
