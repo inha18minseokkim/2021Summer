@@ -15,7 +15,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 object ipadress{
-    @JvmField val urlText = "http://172.30.1.19:14766/byeongseong/".toString()
+    @JvmField val urlText = "http://192.168.1.101:14766/byeongseong/".toString()
 }
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
@@ -26,34 +26,31 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
 
-
-
-        /*viewBinding.button2.setOnClickListener {
-            val intent = Intent(this, SubActivity::class.java)
-            startActivity(intent)
-        }
-
-        viewBinding.button3.setOnClickListener {
-            val intent = Intent(this, SubActivity::class.java)
-            startActivity(intent)
-        }
-
-        viewBinding.button4.setOnClickListener {
-            val intent = Intent(this, SubActivity::class.java)
-            startActivity(intent)
-        }
-
-        viewBinding.button5.setOnClickListener {
-            val intent = Intent(this, SubActivity::class.java)
-            startActivity(intent)
-        }
-
+        /*
         viewBinding.btnOrder.setOnClickListener {
             val intent = Intent(this, OrderActivity::class.java)
             startActivity(intent)
         }*/
-
-
+        viewBinding.btnChicken.setOnClickListener{
+            var intent = Intent(this,SearchActivity::class.java)
+            intent.putExtra("key",1)
+            startActivity(intent)
+        }
+        viewBinding.btnNoodle.setOnClickListener{
+            var intent = Intent(this,SearchActivity::class.java)
+            intent.putExtra("key",2)
+            startActivity(intent)
+        }
+        viewBinding.btnPizza.setOnClickListener{
+            var intent = Intent(this,SearchActivity::class.java)
+            intent.putExtra("key",3)
+            startActivity(intent)
+        }
+        viewBinding.btnJokBal.setOnClickListener{
+            var intent = Intent(this,SearchActivity::class.java)
+            intent.putExtra("key",4)
+            startActivity(intent)
+        }
 
 
         //메인화면 레이아웃 배치
