@@ -1,31 +1,19 @@
 package com.example.a2021summer
 
-import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageInfo
-import android.content.pm.PackageInstaller
-import android.content.pm.PackageManager
-import android.media.MediaSession2
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a2021summer.databinding.ActivityMainBinding
 import com.kakao.auth.AuthType
-import com.kakao.auth.KakaoSDK
 import com.kakao.auth.Session
-import com.kakao.sdk.user.UserApiClient
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
-import kotlin.concurrent.thread
 import com.kakao.usermgmt.UserManagement
-import com.kakao.usermgmt.api.UserApi
 import com.kakao.usermgmt.callback.LogoutResponseCallback
-import com.kakao.util.helper.CommonProtocol
-import com.kakao.util.helper.Utility
+import kotlin.concurrent.thread
 
 
 object ipadress{
@@ -104,6 +92,16 @@ class MainActivity : AppCompatActivity() {
         viewBinding.login.setOnClickListener{
             session.open(AuthType.KAKAO_LOGIN_ALL,this)
         }
+        viewBinding.logout.setOnClickListener{
+            UserManagement.getInstance().requestLogout(object : LogoutResponseCallback() {
+                override fun onCompleteLogout() {
+                    Toast.makeText(this@MainActivity, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+
+            })
+        }
+        var secall = SessionCallback()
+        secall.requestMe()
         /*UserApiClient.instance.me { user, error->
             if(error != null){ Log.d("kakaoLogin","사용자 로그인 안됩니다 시불") }
             else if(user != null) {
