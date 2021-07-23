@@ -1,5 +1,6 @@
 package com.example.a2021summer
 
+import android.content.Context
 import android.util.Log
 import com.kakao.auth.ISessionCallback
 import com.kakao.network.ErrorResult
@@ -10,8 +11,9 @@ import com.kakao.util.OptionalBoolean
 import com.kakao.util.exception.KakaoException
 
 
-class SessionCallback : ISessionCallback {
+class SessionCallback(context: Context) : ISessionCallback {
     // 로그인에 성공한 상태
+    var mainActivityContext = context
     override fun onSessionOpened() {
         requestMe()
     }
@@ -34,7 +36,11 @@ class SessionCallback : ISessionCallback {
                 }
 
                 override fun onSuccess(result: MeV2Response) {
-                    Log.i("KAKAO_API", "사용자 아이디: " + result.id)
+                    Log.i("KAKAO_API", "a사용자 아이디: " + result.id)
+                    var mainActivityContext = mainActivityContext as MainActivity
+                    Log.i("KAKAO_API", "b사용자 아이디: " + mainActivityContext.accountID)
+                    mainActivityContext.accountID = result.id.toString()
+                    Log.i("KAKAO_API", "c사용자 아이디: " + mainActivityContext.accountID)
                     val kakaoAccount = result.kakaoAccount
                     if (kakaoAccount != null) {
 

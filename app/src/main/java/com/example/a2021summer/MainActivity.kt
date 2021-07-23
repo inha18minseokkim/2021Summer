@@ -1,5 +1,6 @@
 package com.example.a2021summer
 
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -11,8 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a2021summer.databinding.ActivityMainBinding
 import com.kakao.auth.AuthType
 import com.kakao.auth.Session
+import com.kakao.network.ErrorResult
 import com.kakao.usermgmt.UserManagement
 import com.kakao.usermgmt.callback.LogoutResponseCallback
+import com.kakao.usermgmt.response.MeV2Response
 import kotlin.concurrent.thread
 
 
@@ -22,18 +25,26 @@ object ipadress{
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
     lateinit var session: Session
-    private var sessionCallback = SessionCallback()
+    private var sessionCallback = SessionCallback(this)
+    var accountID: String ="A"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         val view = viewBinding.root
         setContentView(view)
         /*버튼 및 리스트 초기화 부분*/
-        /*
+
         viewBinding.btnOrder.setOnClickListener {
-            val intent = Intent(this, OrderActivity::class.java)
-            startActivity(intent)
-        }*/
+            if(accountID.equals("A")){
+                Toast.makeText(this,"로그인을 해주세요",Toast.LENGTH_SHORT).show()
+            } else {
+                val intent = Intent(this, OrderActivity::class.java)
+                intent.putExtra("accountID",accountID)
+                startActivity(intent)
+
+            }
+
+        }
         viewBinding.btnChicken.setOnClickListener{
             var intent = Intent(this,SearchActivity::class.java)
             intent.putExtra("key",1)
@@ -91,27 +102,32 @@ class MainActivity : AppCompatActivity() {
         session.addCallback(sessionCallback)
         viewBinding.login.setOnClickListener{
             session.open(AuthType.KAKAO_LOGIN_ALL,this)
+            Log.d("login활동",accountID + "떴냐? 이걸로 리퀘스트 ㄱㄱ")
         }
         viewBinding.logout.setOnClickListener{
+            Log.d("login활동","로그아웃 시도...")
             UserManagement.getInstance().requestLogout(object : LogoutResponseCallback() {
-                override fun onCompleteLogout() {
+                override fun onSuccess(result: Long?) {
+                    super.onSuccess(result)
+                    Log.d("login활동","로그아웃 성공")
+                    accountID = "A"
+                    Log.d("login활동","로그아웃 완료" + accountID)
                     Toast.makeText(this@MainActivity, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFailure(errorResult: ErrorResult?) {
+                    super.onFailure(errorResult)
+                    Log.d("login활동","로그아웃 실패")
+                }
+                override fun onCompleteLogout() {
+                    accountID = "A"
+                    Log.d("login활동","로그아웃 완료" + accountID)
                 }
 
             })
         }
-        var secall = SessionCallback()
-        secall.requestMe()
-        /*UserApiClient.instance.me { user, error->
-            if(error != null){ Log.d("kakaoLogin","사용자 로그인 안됩니다 시불") }
-            else if(user != null) {
-                Log.i("kakaoLogin", "사용자 정보 요청 성공" +
-                        "\n회원번호: ${user.id}" +
-                        "\n이메일: ${user.kakaoAccount?.email}" +
-                        "\n닉네임: ${user.kakaoAccount?.profile?.nickname}" +
-                        "\n프로필사진: ${user.kakaoAccount?.profile?.thumbnailImageUrl}")
-            }
-        }*/
+
+
     }
 
     override fun onDestroy() {
