@@ -97,12 +97,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         /*카카오톡 로그인 API 구현*/
-
         session = Session.getCurrentSession()
         session.addCallback(sessionCallback)
         viewBinding.login.setOnClickListener{
             session.open(AuthType.KAKAO_LOGIN_ALL,this)
             Log.d("login활동",accountID + "떴냐? 이걸로 리퀘스트 ㄱㄱ")
+            AccountManager.accountID = accountID
         }
         viewBinding.logout.setOnClickListener{
             Log.d("login활동","로그아웃 시도...")
@@ -111,6 +111,7 @@ class MainActivity : AppCompatActivity() {
                     super.onSuccess(result)
                     Log.d("login활동","로그아웃 성공")
                     accountID = "A"
+                    AccountManager.accountID = "A"
                     Log.d("login활동","로그아웃 완료" + accountID)
                     Toast.makeText(this@MainActivity, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
                 }

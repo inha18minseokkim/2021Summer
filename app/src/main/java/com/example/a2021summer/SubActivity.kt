@@ -23,7 +23,7 @@ class SubActivity : AppCompatActivity() {
         var jsonmanager = JSONManager()
         var subContext = this
         thread(start=true){
-            var tmp = jsonmanager.loadMenuList(passData[0])
+            var tmp = jsonmanager.loadMenuList(passData [0])
             var menuAdapter = MenuListAdapter(subContext,tmp)
             selected = Array(tmp.size,{i->0})
             runOnUiThread{
@@ -36,18 +36,19 @@ class SubActivity : AppCompatActivity() {
         }//sdf
         viewBinding.goToCart.setOnClickListener{
             var tmplist = mutableListOf<Int>()
+            var tmpcountlist = mutableListOf<Int>()
             for (i in 0..selected.size-1){
-                if(selected[i] == 1){
+                if(selected[i] != 0){
                     tmplist.add(i+1)
+                    tmpcountlist.add(selected[i])
                 }
             }
             if(tmplist.size == 0){
-                Toast.makeText(this,"메뉴를 골라주세요",Toast.LENGTH_SHORT)
+                Toast.makeText(this,"메뉴를 골라주세요",Toast.LENGTH_SHORT).show()
             } else {
-                var intent = Intent(this,OrderActivity::class.java)
-                intent.putExtra("name",passData[2])
-                intent.putExtra("selectedmenu",tmplist.toIntArray())
-                startActivity(intent)
+                thread(start=true){
+                    AccountManager.addCartData(this,passData[2],tmplist,tmpcountlist)
+                }
             }
 
         }
