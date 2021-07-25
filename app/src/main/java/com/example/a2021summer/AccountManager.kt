@@ -9,6 +9,11 @@ import kotlin.concurrent.thread
 
 object AccountManager {
     var accountID: String = "A"
+    lateinit var mainActivityContext: Context
+    fun isLogOn(): Boolean{
+        if(accountID.equals("A")) return false
+        else return true
+    }
     fun addCartData(context: Context, shopName: String, selectedMenu: MutableList<Int>, selectedMenuCount: MutableList<Int>){
         /*스레드 상황에서 쓰세요*/
         if(accountID.equals("A")){

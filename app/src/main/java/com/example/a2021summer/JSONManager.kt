@@ -12,7 +12,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 
-class JSONManager {
+object JSONManager {
     fun loadAllShopList(): MutableList<ShopData> {
         var res = mutableListOf<ShopData>()
         //GlobalScope.launch(Dispatchers.Main){//스레드로 시작

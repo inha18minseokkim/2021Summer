@@ -38,9 +38,9 @@ class SessionCallback(context: Context) : ISessionCallback {
                 override fun onSuccess(result: MeV2Response) {
                     Log.i("KAKAO_API", "a사용자 아이디: " + result.id)
                     var mainActivityContext = mainActivityContext as MainActivity
-                    Log.i("KAKAO_API", "b사용자 아이디: " + mainActivityContext.accountID)
-                    mainActivityContext.accountID = result.id.toString()
-                    Log.i("KAKAO_API", "c사용자 아이디: " + mainActivityContext.accountID)
+                    Log.i("KAKAO_API", "b사용자 아이디: " + AccountManager.accountID)
+                    AccountManager.accountID = result.id.toString()
+                    Log.i("KAKAO_API", "c사용자 아이디: " + AccountManager.accountID)
                     val kakaoAccount = result.kakaoAccount
                     if (kakaoAccount != null) {
 

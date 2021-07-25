@@ -1,21 +1,25 @@
 package com.example.a2021summer
 
-import android.content.Context
-import android.content.DialogInterface
+import android.R
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
+import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a2021summer.databinding.ActivityMainBinding
+import com.google.android.material.navigation.NavigationView
 import com.kakao.auth.AuthType
 import com.kakao.auth.Session
 import com.kakao.network.ErrorResult
 import com.kakao.usermgmt.UserManagement
 import com.kakao.usermgmt.callback.LogoutResponseCallback
-import com.kakao.usermgmt.response.MeV2Response
 import kotlin.concurrent.thread
 
 
@@ -26,20 +30,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
     lateinit var session: Session
     private var sessionCallback = SessionCallback(this)
-    var accountID: String ="A"
+    var mainActivityContext = this
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         val view = viewBinding.root
         setContentView(view)
+        AccountManager.mainActivityContext = this
         /*버튼 및 리스트 초기화 부분*/
-
         viewBinding.btnOrder.setOnClickListener {
-            if(accountID.equals("A")){
+            if(AccountManager.accountID.equals("A")){
                 Toast.makeText(this,"로그인을 해주세요",Toast.LENGTH_SHORT).show()
             } else {
                 val intent = Intent(this, OrderActivity::class.java)
-                intent.putExtra("accountID",accountID)
+                intent.putExtra("accountID",AccountManager.accountID)
                 startActivity(intent)
 
             }
@@ -68,10 +72,10 @@ class MainActivity : AppCompatActivity() {
 
 
         /*메인화면 레이아웃 배치*/
-        var jsonManager = JSONManager()
+        //var jsonManager = JSONManager()
         var mainContext = this
         thread(start=true){
-            var shoplist = jsonManager.loadAllShopList()
+            var shoplist = JSONManager.loadAllShopList()
             var shopadapter = ShopListAdapter(mainContext,shoplist)
             Log.d("recycleView",shoplist.size.toString())
             runOnUiThread{
@@ -83,50 +87,72 @@ class MainActivity : AppCompatActivity() {
             }
         }
         viewBinding.btnSearch.setOnClickListener{
-            var keyword = viewBinding.searchContent.text.toString()
-            if(keyword.isEmpty()){
-                var builder = AlertDialog.Builder(this)
-                builder.setMessage("내용을 입력해 주세요.")
-                builder.setPositiveButton("확인",{ dialogInterface: DialogInterface, i: Int -> })
-                builder.show()
-            } else {
-                var intent = Intent(this,SearchActivity::class.java)
-                intent.putExtra("key",keyword)
-                startActivity(intent)
+            var intent = Intent(this,SearchActivity::class.java)
+            intent.putExtra("key","")
+            startActivity(intent)
+        }
+        /*툴 바 메뉴 설정 및 네비게이션 바 메뉴 설정*/
+        setSupportActionBar(viewBinding.maintoolbar)
+        viewBinding.navView.setNavigationItemSelectedListener(object: NavigationView.OnNavigationItemSelectedListener{
+            override fun onNavigationItemSelected(item: MenuItem): Boolean {
+                item.setChecked(true)
+                viewBinding.drawerLayout.closeDrawers()
+
+                var id = item.itemId
+                when(id){
+                    com.example.a2021summer.R.id.account -> {
+
+                    }
+                    com.example.a2021summer.R.id.setting -> {
+
+                    }
+                    com.example.a2021summer.R.id.logout -> {
+                        if(AccountManager.isLogOn()){ //로그인 되어있으면 로그아웃
+                            UserManagement.getInstance().requestLogout(object : LogoutResponseCallback() {
+                                override fun onSuccess(result: Long?) {
+                                    super.onSuccess(result)
+                                    Log.d("login활동","로그아웃 성공")
+                                    AccountManager.accountID = "A"
+                                    Log.d("login활동","로그아웃 완료" + AccountManager.accountID)
+                                    Toast.makeText(this@MainActivity, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
+                                    var target = viewBinding.navView.menu.findItem(com.example.a2021summer.R.id.logout)
+                                    target.title = "로그인"
+                                }
+
+                                override fun onFailure(errorResult: ErrorResult?) {
+                                    super.onFailure(errorResult)
+                                    Log.d("login활동","로그아웃 실패")
+                                }
+                                override fun onCompleteLogout() {
+
+                                }
+
+                            })
+                        } else {//로그아웃 되어있으면 로그인
+                            session.open(AuthType.KAKAO_LOGIN_ALL,mainActivityContext)
+                            Log.d("login활동",AccountManager.accountID + "떴냐? 이걸로 리퀘스트 ㄱㄱ")
+                            var target = viewBinding.navView.menu.findItem(com.example.a2021summer.R.id.logout)
+                            target.title = "로그아웃"
+                        }
+                    }
+                }
+                return true
             }
+
+        })
+        if(AccountManager.isLogOn()){//로그온 되어있으면 로그아웃버튼 텍스트를 로그아웃으로 만듬.
+            //viewBinding.logout.text = "로그아웃"
+            var target = viewBinding.navView.menu.findItem(com.example.a2021summer.R.id.logout)
+            target.title = "로그아웃"
+        } else {
+            //viewBinding.logout.text = "로그인"
+            var target = viewBinding.navView.menu.findItem(com.example.a2021summer.R.id.logout)
+            target.title = "로그인"
         }
 
         /*카카오톡 로그인 API 구현*/
         session = Session.getCurrentSession()
         session.addCallback(sessionCallback)
-        viewBinding.login.setOnClickListener{
-            session.open(AuthType.KAKAO_LOGIN_ALL,this)
-            Log.d("login활동",accountID + "떴냐? 이걸로 리퀘스트 ㄱㄱ")
-            AccountManager.accountID = accountID
-        }
-        viewBinding.logout.setOnClickListener{
-            Log.d("login활동","로그아웃 시도...")
-            UserManagement.getInstance().requestLogout(object : LogoutResponseCallback() {
-                override fun onSuccess(result: Long?) {
-                    super.onSuccess(result)
-                    Log.d("login활동","로그아웃 성공")
-                    accountID = "A"
-                    AccountManager.accountID = "A"
-                    Log.d("login활동","로그아웃 완료" + accountID)
-                    Toast.makeText(this@MainActivity, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onFailure(errorResult: ErrorResult?) {
-                    super.onFailure(errorResult)
-                    Log.d("login활동","로그아웃 실패")
-                }
-                override fun onCompleteLogout() {
-                    accountID = "A"
-                    Log.d("login활동","로그아웃 완료" + accountID)
-                }
-
-            })
-        }
 
 
     }
@@ -144,6 +170,23 @@ class MainActivity : AppCompatActivity() {
         Log.d("kakaoLogin",data.toString())
         super.onActivityResult(requestCode, resultCode, data)
     }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        var menuInflater = getMenuInflater()
+        menuInflater.inflate(com.example.a2021summer.R.menu.menu_toolbar,menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {//메뉴 우상단 위의 버튼 누르면 내비게이션 드로어 열림
+            com.example.a2021summer.R.id.devinfo -> {
+                //Toast.makeText(this,"일단여기까진했음 근데 뭐지",Toast.LENGTH_SHORT).show()
+                viewBinding.drawerLayout.openDrawer(GravityCompat.START)
+                return true
+            }
+        }
+        return true
+    }
+
     /*private fun getHashKey() {
         var packageInfo: PackageInfo? = null
         try {

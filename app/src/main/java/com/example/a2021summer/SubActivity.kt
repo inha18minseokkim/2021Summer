@@ -20,10 +20,10 @@ class SubActivity : AppCompatActivity() {
         passData = intent.getSerializableExtra("passdata") as Array<String> //1: menutable/ 2: info/ 3: name
         viewBinding.shopTitle.text = passData[2]
         viewBinding.shopInfo.text = passData[1]
-        var jsonmanager = JSONManager()
+        //var jsonmanager = JSONManager()
         var subContext = this
         thread(start=true){
-            var tmp = jsonmanager.loadMenuList(passData [0])
+            var tmp = JSONManager.loadMenuList(passData [0])
             var menuAdapter = MenuListAdapter(subContext,tmp)
             selected = Array(tmp.size,{i->0})
             runOnUiThread{
@@ -47,7 +47,7 @@ class SubActivity : AppCompatActivity() {
                 Toast.makeText(this,"메뉴를 골라주세요",Toast.LENGTH_SHORT).show()
             } else {
                 thread(start=true){
-                    AccountManager.addCartData(this,passData[2],tmplist,tmpcountlist)
+                    AccountManager.addCartData(this,passData[0],tmplist,tmpcountlist)
                 }
             }
 

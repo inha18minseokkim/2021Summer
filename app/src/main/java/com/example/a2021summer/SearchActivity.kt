@@ -2,6 +2,9 @@ package com.example.a2021summer
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a2021summer.databinding.ActivitySearchBinding
@@ -13,7 +16,7 @@ class SearchActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        var jsonManager = JSONManager()
+        //var jsonManager = JSONManager()
         var mainContext = this
         var tmp = intent.getSerializableExtra("key")
         Log.d("searchactivityXX",tmp.javaClass.toString())
@@ -22,7 +25,7 @@ class SearchActivity: AppCompatActivity() {
             var key = tmp as String
             Log.d("searchactivity",key)
             thread(start=true){
-                var shoplist = jsonManager.searchShopList(key)
+                var shoplist = JSONManager.searchShopList(key)
                 var shopadapter = ShopListAdapter(mainContext,shoplist)
                 Log.d("searchactivity",shoplist.toString())
                 runOnUiThread{
@@ -37,7 +40,7 @@ class SearchActivity: AppCompatActivity() {
             var key = tmp as Int
             Log.d("searchactivity",key.toString())
             thread(start=true){
-                var shoplist = jsonManager.searchShopList(key)
+                var shoplist = JSONManager.searchShopList(key)
                 var shopadapter = ShopListAdapter(mainContext,shoplist)
                 Log.d("searchactivity",shoplist.toString())
                 runOnUiThread{
@@ -49,8 +52,11 @@ class SearchActivity: AppCompatActivity() {
                 }
             }
         }
+    viewBinding.btnSearch.setOnClickListener{
 
     }
+    }
+
 
 
 }
