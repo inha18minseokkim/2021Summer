@@ -1,18 +1,41 @@
 package com.example.a2021summer
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 
+@SuppressLint("StaticFieldLeak")
 object AccountManager {
-    var accountID: String = "A"
+    var accountID: String by Delegates.observable("A"){
+        props, old, new ->
+    }
+    var accountNickName: String by Delegates.observable("로그인해주세요"){
+        props, old, new ->
+        (mainActivityContext as MainActivity).setProfileNickname(new)
+    }
+    var accountProfileImage: String by Delegates.observable(""){
+            props, old, new ->
+        (mainActivityContext as MainActivity).setProfileImg(new)
+    }
     lateinit var mainActivityContext: Context
     fun isLogOn(): Boolean{
         if(accountID.equals("A")) return false
         else return true
+    }
+    fun doLogIn(id: String, nickname: String, profileImg: String) {
+        accountID = id
+        accountNickName = nickname
+        accountProfileImage = profileImg
+    }
+    fun doLogOut(){
+        accountID = "A"
+        accountNickName = "로그인해주세요"
+        accountProfileImage = ""
     }
     fun addCartData(context: Context, shopName: String, selectedMenu: MutableList<Int>, selectedMenuCount: MutableList<Int>){
         /*스레드 상황에서 쓰세요*/

@@ -11,5 +11,10 @@
         android:icon="@drawable/account"
         android:title="info"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/btnCart"
+        android:icon="@drawable/cart"
+        android:title="cart"
+        app:showAsAction="always" />
 
 </menu>

@@ -36,14 +36,14 @@ class SessionCallback(context: Context) : ISessionCallback {
                 }
 
                 override fun onSuccess(result: MeV2Response) {
-                    Log.i("KAKAO_API", "a사용자 아이디: " + result.id)
-                    var mainActivityContext = mainActivityContext as MainActivity
-                    Log.i("KAKAO_API", "b사용자 아이디: " + AccountManager.accountID)
-                    AccountManager.accountID = result.id.toString()
-                    Log.i("KAKAO_API", "c사용자 아이디: " + AccountManager.accountID)
+                    Log.i("KAKAO_API", "사용자 아이디: " + result.id)
+                    var accountID = result.id.toString()
+                    var accountNickName = ""
+                    var accountProfileImg = ""
+                    //AccountManager.accountID = result.id.toString()
                     val kakaoAccount = result.kakaoAccount
                     if (kakaoAccount != null) {
-
+                        Log.i("KAKAO_API","됐나?")
                         // 이메일
                         val email = kakaoAccount.email
                         if (email != null) {
@@ -61,12 +61,17 @@ class SessionCallback(context: Context) : ISessionCallback {
                             Log.d("KAKAO_API", "nickname: " + profile.nickname)
                             Log.d("KAKAO_API", "profile image: " + profile.profileImageUrl)
                             Log.d("KAKAO_API", "thumbnail image: " + profile.thumbnailImageUrl)
+                            accountNickName = profile.nickname
+                            accountProfileImg = profile.profileImageUrl
+                            //AccountManager.accountNickName = profile.nickname
                         } else if (kakaoAccount.profileNeedsAgreement() == OptionalBoolean.TRUE) {
                             // 동의 요청 후 프로필 정보 획득 가능
                         } else {
                             // 프로필 획득 불가
                         }
                     }
+                    AccountManager.doLogIn(accountID,accountNickName,accountProfileImg)
+                    (mainActivityContext as MainActivity).SwapNavDrawerLogInOut()
                 }
             })
     }

@@ -2,10 +2,12 @@ package com.example.a2021summer
 
 import android.R
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +22,8 @@ import com.kakao.auth.Session
 import com.kakao.network.ErrorResult
 import com.kakao.usermgmt.UserManagement
 import com.kakao.usermgmt.callback.LogoutResponseCallback
+import com.kakao.usermgmt.callback.UnLinkResponseCallback
+import java.net.URL
 import kotlin.concurrent.thread
 
 
@@ -38,17 +42,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
         AccountManager.mainActivityContext = this
         /*버튼 및 리스트 초기화 부분*/
-        viewBinding.btnOrder.setOnClickListener {
-            if(AccountManager.accountID.equals("A")){
-                Toast.makeText(this,"로그인을 해주세요",Toast.LENGTH_SHORT).show()
-            } else {
-                val intent = Intent(this, OrderActivity::class.java)
-                intent.putExtra("accountID",AccountManager.accountID)
-                startActivity(intent)
-
-            }
-
-        }
         viewBinding.btnChicken.setOnClickListener{
             var intent = Intent(this,SearchActivity::class.java)
             intent.putExtra("key",1)
@@ -86,11 +79,7 @@ class MainActivity : AppCompatActivity() {
                 shopadapter.notifyDataSetChanged()
             }
         }
-        viewBinding.btnSearch.setOnClickListener{
-            var intent = Intent(this,SearchActivity::class.java)
-            intent.putExtra("key","")
-            startActivity(intent)
-        }
+
         /*툴 바 메뉴 설정 및 네비게이션 바 메뉴 설정*/
         setSupportActionBar(viewBinding.maintoolbar)
         viewBinding.navView.setNavigationItemSelectedListener(object: NavigationView.OnNavigationItemSelectedListener{
@@ -111,12 +100,11 @@ class MainActivity : AppCompatActivity() {
                             UserManagement.getInstance().requestLogout(object : LogoutResponseCallback() {
                                 override fun onSuccess(result: Long?) {
                                     super.onSuccess(result)
+                                    AccountManager.doLogOut()
                                     Log.d("login활동","로그아웃 성공")
-                                    AccountManager.accountID = "A"
                                     Log.d("login활동","로그아웃 완료" + AccountManager.accountID)
                                     Toast.makeText(this@MainActivity, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show()
-                                    var target = viewBinding.navView.menu.findItem(com.example.a2021summer.R.id.logout)
-                                    target.title = "로그인"
+                                    SwapNavDrawerLogInOut()
                                 }
 
                                 override fun onFailure(errorResult: ErrorResult?) {
@@ -129,39 +117,65 @@ class MainActivity : AppCompatActivity() {
 
                             })
                         } else {//로그아웃 되어있으면 로그인
-                            session.open(AuthType.KAKAO_LOGIN_ALL,mainActivityContext)
-                            Log.d("login활동",AccountManager.accountID + "떴냐? 이걸로 리퀘스트 ㄱㄱ")
-                            var target = viewBinding.navView.menu.findItem(com.example.a2021summer.R.id.logout)
-                            target.title = "로그아웃"
+                            session.open(AuthType.KAKAO_ACCOUNT,mainActivityContext)
+                            Log.d("login활동",AccountManager.accountID + "아이디로 로그인 완료")
+
                         }
+                    }
+                    com.example.a2021summer.R.id.unlink -> {
+                        UserManagement.getInstance().requestUnlink(object: UnLinkResponseCallback() {
+                            override fun onSuccess(result: Long?) {
+                                Toast.makeText(mainActivityContext,"탈퇴 완료",Toast.LENGTH_SHORT).show()
+                                AccountManager.doLogOut()
+                                SwapNavDrawerLogInOut()
+                            }
+
+                            override fun onSessionClosed(errorResult: ErrorResult?) {
+
+                            }
+
+                        })
                     }
                 }
                 return true
             }
 
         })
-        if(AccountManager.isLogOn()){//로그온 되어있으면 로그아웃버튼 텍스트를 로그아웃으로 만듬.
-            //viewBinding.logout.text = "로그아웃"
-            var target = viewBinding.navView.menu.findItem(com.example.a2021summer.R.id.logout)
-            target.title = "로그아웃"
-        } else {
-            //viewBinding.logout.text = "로그인"
-            var target = viewBinding.navView.menu.findItem(com.example.a2021summer.R.id.logout)
-            target.title = "로그인"
-        }
 
         /*카카오톡 로그인 API 구현*/
         session = Session.getCurrentSession()
         session.addCallback(sessionCallback)
-
-
+        SwapNavDrawerLogInOut()
     }
-
+    fun setProfileNickname(nickname: String){
+        viewBinding.navView.getHeaderView(0).findViewById<TextView>(com.example.a2021summer.R.id.accountNickname).text = nickname
+    }
+    fun setProfileImg(profileImg: String){
+        if(profileImg.isEmpty() == false){
+            var task = DownLoadFileTask(viewBinding.navView.getHeaderView(0).findViewById(com.example.a2021summer.R.id.accountImage))
+            task.execute(profileImg)
+        } else {
+            (viewBinding.navView.getHeaderView(0).findViewById(com.example.a2021summer.R.id.accountImage) as ImageView).setImageResource(
+                com.kakao.util.R.drawable.kakao_default_profile_image
+            )
+        }
+    }
+    fun SwapNavDrawerLogInOut() {
+        if(AccountManager.isLogOn()){
+            viewBinding.navView.menu.findItem(com.example.a2021summer.R.id.logout).title = "로그아웃"
+        } else {
+            viewBinding.navView.menu.findItem(com.example.a2021summer.R.id.logout).title = "로그인"
+        }
+    }
     override fun onDestroy() {
         super.onDestroy()
-        Session.getCurrentSession().removeCallback(sessionCallback);
+        Session.getCurrentSession().removeCallback(sessionCallback)
     }
-
+    override fun onResume(){
+        super.onResume()
+        setProfileImg(AccountManager.accountProfileImage)
+        setProfileNickname(AccountManager.accountNickName)
+    }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         // 카카오톡|스토리 간편로그인 실행 결과를 받아서 SDK로 전달
         if(Session.getCurrentSession().handleActivityResult(requestCode,resultCode,data)){
@@ -182,6 +196,21 @@ class MainActivity : AppCompatActivity() {
                 //Toast.makeText(this,"일단여기까진했음 근데 뭐지",Toast.LENGTH_SHORT).show()
                 viewBinding.drawerLayout.openDrawer(GravityCompat.START)
                 return true
+            }
+            com.example.a2021summer.R.id.btnsearch -> {//검색버튼 누르면 검색창 열림
+                var intent = Intent(this,SearchActivity::class.java)
+                intent.putExtra("key","")
+                startActivity(intent)
+                return true
+            }
+            com.example.a2021summer.R.id.btnCart -> {//카트버튼 누르면 장바구니 가는화면
+                if(AccountManager.isLogOn() == false){
+                    Toast.makeText(this,"로그인을 해주세요",Toast.LENGTH_SHORT).show()
+                } else {
+                    val intent = Intent(this, OrderActivity::class.java)
+                    intent.putExtra("accountID",AccountManager.accountID)
+                    startActivity(intent)
+                }
             }
         }
         return true

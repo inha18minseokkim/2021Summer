@@ -22,19 +22,10 @@
             app:layout_constraintTop_toTopOf="parent"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <Button
-            android:id="@+id/btnSearch"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="?android:attr/actionModeWebSearchDrawable"
-            app:layout_constraintStart_toStartOf="@+id/maintoolbar"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -78,16 +69,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/mainshoplist"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btnOrder"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="장바구니"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/maintoolbar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
