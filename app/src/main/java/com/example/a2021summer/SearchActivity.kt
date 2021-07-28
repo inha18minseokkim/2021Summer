@@ -53,7 +53,20 @@ class SearchActivity: AppCompatActivity() {
             }
         }
     viewBinding.btnSearch.setOnClickListener{
-
+        var key = viewBinding.searchContent.text.toString()
+        Log.d("searchactivity",key)
+        thread(start=true){
+            var shoplist = JSONManager.searchShopList(key)
+            var shopadapter = ShopListAdapter(mainContext,shoplist)
+            Log.d("searchactivity",shoplist.toString())
+            runOnUiThread{
+                viewBinding.mainshoplist.adapter = shopadapter
+                var layout = LinearLayoutManager(mainContext)
+                viewBinding.mainshoplist.layoutManager = layout
+                viewBinding.mainshoplist.setHasFixedSize(true)
+                shopadapter.notifyDataSetChanged()
+            }
+        }
     }
     }
 

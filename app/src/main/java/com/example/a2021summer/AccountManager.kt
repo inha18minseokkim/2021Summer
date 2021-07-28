@@ -38,8 +38,8 @@ object AccountManager {
         accountProfileImage = ""
     }
     fun addCartData(context: Context, shopName: String, selectedMenu: MutableList<Int>, selectedMenuCount: MutableList<Int>){
-        /*스레드 상황에서 쓰세요*/
-        if(accountID.equals("A")){
+        /*스레드 상황에서 쓰세요 subActivity에서 카트 담을때 쓰는 함수*/
+        if(isLogOn() == false){
             (context as SubActivity).runOnUiThread{
             Toast.makeText(context,"로그인을 먼저 해주세요 제발",Toast.LENGTH_SHORT).show()
             }

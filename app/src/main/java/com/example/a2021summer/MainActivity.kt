@@ -173,8 +173,11 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onResume(){
         super.onResume()
+        /*나갔다 들어오면 초기화되더라..*/
         setProfileImg(AccountManager.accountProfileImage)
         setProfileNickname(AccountManager.accountNickName)
+        SwapNavDrawerLogInOut()
+
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         // 카카오톡|스토리 간편로그인 실행 결과를 받아서 SDK로 전달
@@ -208,7 +211,6 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this,"로그인을 해주세요",Toast.LENGTH_SHORT).show()
                 } else {
                     val intent = Intent(this, OrderActivity::class.java)
-                    intent.putExtra("accountID",AccountManager.accountID)
                     startActivity(intent)
                 }
             }

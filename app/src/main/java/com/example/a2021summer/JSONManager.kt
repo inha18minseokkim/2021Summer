@@ -152,5 +152,34 @@ object JSONManager {
         }
         return res
     }
+    fun loadCartData() {
+        var urlText = ipadress.urlText + "getCartData.jsp?accountID=" + AccountManager.accountID
+        val url = URL(urlText)
+        Log.d("cartdata",urlText +" 로딩 ㄱㄱ")
+        val urlConnection = url.openConnection() as HttpURLConnection
+        if (urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
+            val streamReader = InputStreamReader(urlConnection.inputStream)
+            val buffered = BufferedReader(streamReader)
+            val content = StringBuilder()
+            while (true) {
+                val line = buffered.readLine() ?: break
+                content.append(line)
+            }
+            buffered.close()
+            urlConnection.disconnect()
+            var tmpfile = JSONObject(content.toString())
+            var cartData = CartData.loadData(tmpfile)
+        }
+    }
+    fun updateCartData(res: JSONObject){
+        var urlText = ipadress.urlText + "setCartData.jsp?accountID="+AccountManager.accountID+"&&cart="+res.toString()
+        val url = URL(urlText)
+        Log.d("cartdata",urlText +" 로딩 ㄱㄱ")
+        val urlConnection = url.openConnection() as HttpURLConnection
+        if (urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
+            Log.d("updateCartData","업데이트 완료")
+            urlConnection.disconnect()
 
+        }
+    }
 }
