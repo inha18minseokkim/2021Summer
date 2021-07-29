@@ -1,10 +1,16 @@
 package com.example.a2021summer
 
 import android.util.Log
+import android.widget.Toast
+import com.example.a2021summer.ipadress.urlText
 import org.json.JSONArray
 import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 
 
 /*json 받아오고 출력하는 예시*/
@@ -41,6 +47,21 @@ object CartData {
     lateinit var shopMenu: ArrayList<ArrayList<String>>
     lateinit var menuCount: ArrayList<ArrayList<String>>
     lateinit var dataforadapter : ArrayList<Item>
+    var totalCost: Int by Delegates.observable(0){
+        props,old,new ->
+        thread(start=true){
+            val urlText = ipadress.urlText + "updateCurCost.jsp?accountID="+ AccountManager.accountID + "&&cost=" + new
+            Log.d("addCart",urlText +"리퀘스트 중...")
+            val url = URL(urlText)
+            val urlConnection = url.openConnection() as HttpURLConnection
+            if(urlConnection.responseCode == HttpURLConnection.HTTP_OK){
+                Log.d("totalCost","가격 갱신완료")
+            } else {
+                Log.d("totalCost","가격 갱신실패")
+            }
+        }
+
+    }
     fun loadData(raw: JSONObject) {
         shopName = ArrayList()
         shopMenu = ArrayList()

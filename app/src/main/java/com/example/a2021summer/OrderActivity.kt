@@ -12,7 +12,7 @@ import kotlinx.coroutines.delay
 import kotlin.concurrent.thread
 
 class OrderActivity : AppCompatActivity() {
-    private lateinit var viewBinding: ActivityOrderBinding
+    lateinit var viewBinding: ActivityOrderBinding
     var tmpidx = 0
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -35,9 +35,9 @@ class OrderActivity : AppCompatActivity() {
                 viewBinding.recycleView.setHasFixedSize(true)
                 Log.d("OrderListAdapter","여기까지는됨3")
                 orderadapter.notifyDataSetChanged()
-
             }
         }
+
 
     }
 

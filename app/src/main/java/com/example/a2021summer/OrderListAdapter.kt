@@ -16,6 +16,7 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
+import kotlin.properties.Delegates
 
 class OrderListAdapter(var context: Context, var data: ArrayList<Item>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var adapterContext = this
@@ -88,31 +89,50 @@ class OrderListAdapter(var context: Context, var data: ArrayList<Item>) : Recycl
         }
     }
     class MenuViewHolder(var view: View, var adapter: OrderListAdapter): RecyclerView.ViewHolder(view) {
+        var menuviewholder = this
         val menuName = view.findViewById<TextView>(R.id.cartmenuName)
         val menuPrice = view.findViewById<TextView>(R.id.cartmenuPrice)
         val quantity = view.findViewById<TextView>(R.id.Quantity)
         val btnPlus = view.findViewById<Button>(R.id.btnPlus)
         val btnMinus = view.findViewById<Button>(R.id.btnMinus)
+        val productRes = view.findViewById<TextView>(R.id.productRes)
+        var curPrice: Int by Delegates.observable(0) {
+            props,old,new ->
+            productRes.text = curPrice.toString()
+        }
         fun bind(item: menuElement){
             //menuName.text = item.shopMenu
-            var menunametask = GetMenuNameTask(item.shopname,item.shopMenu,menuName,adapter)
-            menunametask.execute()
-            Log.d("OrderListAdapter",item.shopMenu.toString() + item.menuCount + "ASDF")
             quantity.text = item.menuCount
+            var menutask = GetMenuInfoTask(adapter.context, menuviewholder, item.shopname,item.shopMenu,menuName,menuPrice,productRes,Integer.parseInt(item.menuCount))
+            menutask.execute()
+            Log.d("OrderListAdapter",item.shopMenu.toString() + item.menuCount + "ASDF")
+
             btnPlus.setOnClickListener {
                 var curcnt: Int = Integer.parseInt(quantity.text.toString())
                 curcnt += 1
                 quantity.text = curcnt.toString()
+                curPrice += Integer.parseInt(menuPrice.text.toString())
                 CartData.modifyCount(item.shopname,Integer.parseInt(item.shopMenu),1)
-                thread(start=true) {JSONManager.updateCartData(CartData.convertToJSON())}
+                thread(start=true) {
+                    JSONManager.updateCartData(CartData.convertToJSON())
+                    var res = CartData.getDataForOrderAdapter()
+                }
+                CartData.totalCost += Integer.parseInt(menuPrice.text.toString())
+                (adapter.context as OrderActivity).viewBinding.totalCost.text = CartData.totalCost.toString()
             }
             btnMinus.setOnClickListener {
                 var curcnt: Int = Integer.parseInt(quantity.text.toString())
                 if(curcnt != 0){
                     curcnt -= 1
                     quantity.text = curcnt.toString()
+                    curPrice -= Integer.parseInt(menuPrice.text.toString())
                     CartData.modifyCount(item.shopname,Integer.parseInt(item.shopMenu),-1)
-                    thread(start=true) {JSONManager.updateCartData(CartData.convertToJSON())}
+                    thread(start=true) {
+                        JSONManager.updateCartData(CartData.convertToJSON())
+                        var res = CartData.getDataForOrderAdapter()
+                    }
+                    CartData.totalCost -= Integer.parseInt(menuPrice.text.toString())
+                    (adapter.context as OrderActivity).viewBinding.totalCost.text = CartData.totalCost.toString()
                 }
 
             }
@@ -152,12 +172,16 @@ class GetShopNameTask(var menuTableName: String, var targetShopName: TextView, v
         targetShopName.text = result
     }
 }
-class GetMenuNameTask(var menuTableName: String, var menuIdx: String, var targetMenuName: TextView, var adapter: OrderListAdapter) : AsyncTask<String, Void, String>() {
-    override fun doInBackground(vararg p0: String?): String {
+
+class GetMenuInfoTask(var orderActivity: Context, var viewholder: OrderListAdapter.MenuViewHolder, var menuTableName: String, var menuIdx: String,  var targetMenuName: TextView, var targetMenuPrice: TextView,
+                      var productRes: TextView, var cnt: Int) : AsyncTask<String,Void,Pair<String,String>>(){
+    override fun doInBackground(vararg p0: String?): Pair<String, String> {
+        lateinit var menuname: String
+        lateinit var menuprice: String
         var urlText = ipadress.urlText + "getShortData/getMenuName.jsp?menutable=" + menuTableName + "&&menuidx="+menuIdx
-        Log.d("GetMenuNameTask",urlText)
-        val url = URL(urlText)
-        val urlConnection = url.openConnection() as HttpURLConnection
+        Log.d("GetMenuPriceTask",urlText)
+        var url = URL(urlText)
+        var urlConnection = url.openConnection() as HttpURLConnection
         if(urlConnection.responseCode == HttpURLConnection.HTTP_OK){
             val streamReader = InputStreamReader(urlConnection.inputStream)
             val buffered = BufferedReader(streamReader)
@@ -167,13 +191,42 @@ class GetMenuNameTask(var menuTableName: String, var menuIdx: String, var target
                 content.append(line)
             }
             buffered.close()
+            menuname = content.toString()
             urlConnection.disconnect()
-            return content.toString()
+
+        } else {
+            menuname = "Null"
         }
-        return "오류다오류"
+        urlText = ipadress.urlText + "getShortData/getMenuPrice.jsp?menutable=" + menuTableName + "&&menuidx="+menuIdx
+        Log.d("GetMenuPriceTask",urlText)
+        url = URL(urlText)
+        urlConnection = url.openConnection() as HttpURLConnection
+        if(urlConnection.responseCode == HttpURLConnection.HTTP_OK){
+            val streamReader = InputStreamReader(urlConnection.inputStream)
+            val buffered = BufferedReader(streamReader)
+            val content = StringBuilder()
+            while(true){
+                val line = buffered.readLine() ?: break
+                content.append(line)
+            }
+            buffered.close()
+            menuprice = content.toString()
+            urlConnection.disconnect()
+
+        } else {
+            menuprice = "0"
+        }
+        return Pair(menuname,menuprice)
     }
 
-    override fun onPostExecute(result: String?) {
-        targetMenuName.text = result
+    override fun onPostExecute(result: Pair<String, String>?) {
+        var menuname = result?.first
+        var menuprice = result!!.second
+        targetMenuName.text = menuname
+        targetMenuPrice.text = menuprice
+        productRes.text = (Integer.parseInt(menuprice) * cnt).toString()
+        viewholder.curPrice = Integer.parseInt(menuprice) * cnt
+        CartData.totalCost += Integer.parseInt(menuprice) * cnt
+        (orderActivity as OrderActivity).viewBinding.totalCost.text = CartData.totalCost.toString()
     }
 }
