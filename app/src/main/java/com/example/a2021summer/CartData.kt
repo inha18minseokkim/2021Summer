@@ -191,6 +191,19 @@ object CartData {
         Log.d("getDataForOrderAdapter",dataforadapter.size.toString() + "생성완료")
         return dataforadapter
     }
+    fun delElement(idx: Int){
+        var targetElement = dataforadapter[idx] as menuElement
+        var tmpIdx = targetElement.shopMenu
+        var targetIdx = shopName.indexOf(targetElement.shopname)
+        var menuIdx = shopMenu[targetIdx].indexOf(tmpIdx)
+        shopMenu[targetIdx].removeAt(menuIdx)
+        menuCount[targetIdx].removeAt(menuIdx)
+        if(shopMenu[targetIdx].size == 0){
+            shopName.removeAt(targetIdx)
+            shopMenu.removeAt(targetIdx)
+            menuCount.removeAt(targetIdx)
+        }
+    }
     fun modifyCount(targetShop: String, targetidx: Int, direct: Int) {
         var shoptarget: Int = shopName.indexOf(targetShop)
         var menutarget = shopMenu[shoptarget].indexOf(targetidx.toString())

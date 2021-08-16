@@ -34,10 +34,13 @@ class ShopListAdapter(private val context: Context, var data: MutableList<ShopDa
         private val shoplogo = itemView.findViewById<ImageView>(R.id.shoplogo)
         private val shopname = itemView.findViewById<TextView>(R.id.shopname)
         private val shopscore = itemView.findViewById<TextView>(R.id.shopscore)
+
         fun bind(item: ShopData){
             Log.d("recycleview",item.name.toString())
             shopname.text = item.name
             shopscore.text = item.score.toString()
+            var tmp = DownLoadShopLogo(shoplogo,item.name)
+            tmp.execute()
             itemView.setOnClickListener{
                 Intent(context, SubActivity::class.java).apply{
                     putExtra("passdata",arrayOf(item.menutable,item.info,item.name))

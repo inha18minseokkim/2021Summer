@@ -73,6 +73,17 @@ object AccountManager {
                 Toast.makeText(context,"뭔가 문제가 있음",Toast.LENGTH_SHORT).show();
             }
         }
-
+    }
+    fun updateLocation(deliverySpot: String){
+        thread(start=true){
+            val urlText = ipadress.urlText + "setAccountLocation.jsp?account="+accountID+"&&delivery="+deliverySpot
+            val url = URL(urlText)
+            val urlConnection = url.openConnection() as HttpURLConnection
+            if(urlConnection.responseCode == HttpURLConnection.HTTP_OK){
+                Log.d("AccountManager","위치정보 업뎃 성공")
+            } else {
+                Log.d("AccountManager","뭔가 문제가 있는 것 같음")
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.a2021summer
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.a2021summer.databinding.ActivityOrderBinding
 import com.example.a2021summer.databinding.ActivitySubBinding
 import kotlinx.coroutines.delay
+import java.util.zip.Inflater
 import kotlin.concurrent.thread
 
 class OrderActivity : AppCompatActivity() {
@@ -22,6 +24,7 @@ class OrderActivity : AppCompatActivity() {
         setSupportActionBar(viewBinding.ordertoolbar)
         /*리사이클러뷰 아답터 설정해서 뿌리기*/
         var orderContext = this
+        CartData.totalCost = 0
         thread(start=true){
             JSONManager.loadCartData()
             var li = CartData.getDataForOrderAdapter()
@@ -36,6 +39,10 @@ class OrderActivity : AppCompatActivity() {
                 Log.d("OrderListAdapter","여기까지는됨3")
                 orderadapter.notifyDataSetChanged()
             }
+        }
+        viewBinding.OrderGo.setOnClickListener {
+            var intent = Intent(this,OrderCheckActivity::class.java)
+            startActivity(intent)
         }
 
 

@@ -1,6 +1,8 @@
 package com.example.a2021summer
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.AsyncTask
 import android.text.SpannableStringBuilder
 import android.util.Log
@@ -34,6 +36,7 @@ class OrderListAdapter(var context: Context, var data: ArrayList<Item>) : Recycl
                 Log.d("OrderListAdapter","뭔가잘못됨")
                 throw Exception("이게뭐노;;")
             }
+
         }
 
 
@@ -56,10 +59,10 @@ class OrderListAdapter(var context: Context, var data: ArrayList<Item>) : Recycl
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder){
             is ShopViewHolder -> {
-                holder.bind(data[position] as menuTitle)
+                holder.bind(data[position] as menuTitle, position)
             }
             is MenuViewHolder -> {
-                holder.bind(data[position] as menuElement)
+                holder.bind(data[position] as menuElement, position)
             }
             else -> {
                 Log.d("OrderListAdapter","뭐야")
@@ -74,7 +77,7 @@ class OrderListAdapter(var context: Context, var data: ArrayList<Item>) : Recycl
 
     class ShopViewHolder(var view: View, var adapter: OrderListAdapter): RecyclerView.ViewHolder(view) {
         val shopName = view.findViewById<TextView>(R.id.cartshopName)
-        fun bind(item: menuTitle){
+        fun bind(item: menuTitle, idx: Int){
             var shopnametask = GetShopNameTask(item.shopname,shopName,adapter)
             shopnametask.execute()
             //shopName.text = item.shopname
@@ -96,11 +99,12 @@ class OrderListAdapter(var context: Context, var data: ArrayList<Item>) : Recycl
         val btnPlus = view.findViewById<Button>(R.id.btnPlus)
         val btnMinus = view.findViewById<Button>(R.id.btnMinus)
         val productRes = view.findViewById<TextView>(R.id.productRes)
+        val btnDelete = view.findViewById<Button>(R.id.btnDelete)
         var curPrice: Int by Delegates.observable(0) {
             props,old,new ->
             productRes.text = curPrice.toString()
         }
-        fun bind(item: menuElement){
+        fun bind(item: menuElement, idx: Int){
             //menuName.text = item.shopMenu
             quantity.text = item.menuCount
             var menutask = GetMenuInfoTask(adapter.context, menuviewholder, item.shopname,item.shopMenu,menuName,menuPrice,productRes,Integer.parseInt(item.menuCount))
@@ -122,7 +126,7 @@ class OrderListAdapter(var context: Context, var data: ArrayList<Item>) : Recycl
             }
             btnMinus.setOnClickListener {
                 var curcnt: Int = Integer.parseInt(quantity.text.toString())
-                if(curcnt != 0){
+                if(curcnt > 1){
                     curcnt -= 1
                     quantity.text = curcnt.toString()
                     curPrice -= Integer.parseInt(menuPrice.text.toString())
@@ -134,8 +138,38 @@ class OrderListAdapter(var context: Context, var data: ArrayList<Item>) : Recycl
                     CartData.totalCost -= Integer.parseInt(menuPrice.text.toString())
                     (adapter.context as OrderActivity).viewBinding.totalCost.text = CartData.totalCost.toString()
                 }
-
             }
+            btnDelete.setOnClickListener {
+                AlertDialog.Builder(adapter.context).setTitle("삭제").setMessage("삭제할래?").setPositiveButton(android.R.string.yes,
+                    DialogInterface.OnClickListener{
+                            dialog, whichButton ->
+                        CartData.delElement(idx)
+                        CartData.totalCost -= curPrice
+                        thread(start=true){
+                            JSONManager.updateCartData(CartData.convertToJSON())
+                            var res = CartData.getDataForOrderAdapter()
+                            (adapter.context as OrderActivity).runOnUiThread{
+                                adapter.data = res
+                                CartData.totalCost = 0
+                                adapter.notifyDataSetChanged()
+                            }
+                        }
+                    }).setNegativeButton("no",DialogInterface.OnClickListener({
+                        dialog, whichButton ->
+
+                })).show()
+
+                /*CartData.delElement(idx)
+                thread(start=true){
+                    JSONManager.updateCartData(CartData.convertToJSON())
+                    var res = CartData.getDataForOrderAdapter()
+                    (adapter.context as OrderActivity).runOnUiThread{
+                        adapter.data = res
+                        adapter.notifyDataSetChanged()
+                    }
+                }*/
+            }
+
         }
         companion object Factory{
             fun create(parent: ViewGroup, adapter: OrderListAdapter) : MenuViewHolder {

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.a2021summer">
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".GlobalApplication"
         android:allowBackup="true"
@@ -11,9 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:usesCleartextTraffic="true">
+        <activity android:name=".KakaoPayActivity"></activity>
+
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,9 +26,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SubActivity"/>
-        <activity android:name=".SearchActivity"/>
-        <activity android:name=".OrderActivity"/>
+        <activity android:name=".SubActivity" />
+        <activity android:name=".SearchActivity" />
+        <activity android:name=".OrderActivity" />
+        <activity android:name=".OrderCheckActivity" />
     </application>
 
 </manifest>
